@@ -2,14 +2,9 @@ import { useEffect, useState } from "react";
 import { Moon, Plus, Sun } from "lucide-react";
 import "./App.css";
 import { Button } from "./components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "./components/ui/table";
+
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router";
+import HomePage from "./pages/Homepage";
 
 function App() {
   const [isDark, setIsDark] = useState(true);
@@ -19,80 +14,26 @@ function App() {
     document.documentElement.classList.toggle("dark", isDark);
   }, [isDark]);
 
-  const holdings = [
-    {
-      ticker: "TICK",
-      price: "$10",
-    },
-    {
-      ticker: "TICK",
-      price: "$10",
-    },
-    {
-      ticker: "TICK",
-      price: "$10",
-    },
-    {
-      ticker: "TICK",
-      price: "$10",
-    },
-    {
-      ticker: "TICK",
-      price: "$10",
-    },
-    {
-      ticker: "TICK",
-      price: "$10",
-    },
-    {
-      ticker: "TICK",
-      price: "$10",
-    },
-    {
-      ticker: "TICK",
-      price: "$10",
-    },
-  ];
   return (
-    <>
-      <Button
-        variant="outline"
-        size="icon"
-        aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-        onClick={() => setIsDark((prev) => !prev)}
-      >
-        {isDark ? <Sun /> : <Moon />}
-      </Button>
-      hello
-      <Button>Buy</Button>
-      <Button variant="outline">Watchlist</Button>
-      <Button variant="destructive">Sell</Button>
-      <Button variant="ghost" size="sm">
-        Details
-      </Button>
-      <Button size="icon" aria-label="Add">
-        <Plus />
-      </Button>
-      <div style={{ width: 500, padding: "2rem" }}>
-        {" "}
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Ticker</TableHead>
-              <TableHead className="text-right">Price</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {holdings.map((h) => (
-              <TableRow key={h.ticker}>
-                <TableCell>{h.ticker}</TableCell>
-                <TableCell className="text-right">${h.price}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+    <BrowserRouter>
+      <div className="absolute right-4 top-4 ">
+        <Button
+          variant="outline"
+          size="icon"
+          aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+          onClick={() => setIsDark((prev) => !prev)}
+        >
+          {isDark ? <Sun /> : <Moon />}
+        </Button>
       </div>
-    </>
+      <Routes>
+        <Route path="/*" element={<HomePage />} />
+        {/* <Route element={<RequireAuth />}>
+          <Route path="/" element={<WatchlistPage />} />
+          <Route path="/symbol/:symbol" element={<SymbolDetailPage />} />
+        </Route> */}
+      </Routes>
+    </BrowserRouter>
   );
 }
 
