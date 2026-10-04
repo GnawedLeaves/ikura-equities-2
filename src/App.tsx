@@ -1,4 +1,5 @@
-import { Plus } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Moon, Plus, Sun } from "lucide-react";
 import "./App.css";
 import { Button } from "./components/ui/button";
 import {
@@ -11,6 +12,13 @@ import {
 } from "./components/ui/table";
 
 function App() {
+  const [isDark, setIsDark] = useState(true);
+
+  // shadcn's dark tokens are scoped to a `.dark` class on <html>
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", isDark);
+  }, [isDark]);
+
   const holdings = [
     {
       ticker: "TICK",
@@ -47,6 +55,14 @@ function App() {
   ];
   return (
     <>
+      <Button
+        variant="outline"
+        size="icon"
+        aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+        onClick={() => setIsDark((prev) => !prev)}
+      >
+        {isDark ? <Sun /> : <Moon />}
+      </Button>
       hello
       <Button>Buy</Button>
       <Button variant="outline">Watchlist</Button>
