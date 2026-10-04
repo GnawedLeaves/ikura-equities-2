@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../hooks";
 import {
   TableHeader,
@@ -12,6 +12,7 @@ import { Input } from "../../ui/input";
 import { Field, FieldLabel, FieldDescription } from "../../ui/field";
 import { Button } from "../../ui/button";
 import { symbolAdded } from "../../../features/watchlist/watchlistSlice";
+import { fetchInstruments } from "../../../features/instruments/instrumentsSlice";
 
 const WatchList = () => {
   //using the redux store etc
@@ -26,6 +27,10 @@ const WatchList = () => {
       setInput("");
     }
   };
+  useEffect(() => {
+    const request = dispatch(fetchInstruments()); // starts the fetch
+    return () => request.abort();
+  }, [dispatch]);
 
   return (
     <div style={{ width: 500 }}>
