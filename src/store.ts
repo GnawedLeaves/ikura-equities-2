@@ -2,9 +2,13 @@
 
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import watchListReducer from "./features/watchlist/watchlistSlice";
+import pricesReducer from "./features/prices/pricesSlice";
+import instrumentReducer from "./features/instruments/instrumentsSlice";
 
 const rootReducer = combineReducers({
-  watchList: watchListReducer,
+  watchlist: watchListReducer,
+  prices: pricesReducer,
+  instruments: instrumentReducer,
 });
 
 export const setupStore = (preloadedState?: Partial<RootState>) =>

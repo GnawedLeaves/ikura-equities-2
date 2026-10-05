@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { Instrument } from "../../types";
-import { act } from "react";
 
 //instruments gets the details of the symbols that watchlist stores
 export interface InstrumentsState {

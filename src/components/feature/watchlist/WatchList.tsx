@@ -17,7 +17,7 @@ import { fetchInstruments } from "../../../features/instruments/instrumentsSlice
 const WatchList = () => {
   //using the redux store etc
   const dispatch = useAppDispatch();
-  const symbols = useAppSelector((state) => state.watchList.symbols);
+  const symbols = useAppSelector((state) => state.watchlist.symbols);
 
   const [input, setInput] = useState<string>("");
   const handleAddSymbol = () => {
