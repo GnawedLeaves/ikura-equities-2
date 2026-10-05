@@ -4,6 +4,7 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import watchListReducer from "./features/watchlist/watchlistSlice";
 import pricesReducer from "./features/prices/pricesSlice";
 import instrumentReducer from "./features/instruments/instrumentsSlice";
+import { socketMiddleware } from "./socketMiddleware";
 
 const rootReducer = combineReducers({
   watchlist: watchListReducer,
@@ -12,7 +13,12 @@ const rootReducer = combineReducers({
 });
 
 export const setupStore = (preloadedState?: Partial<RootState>) =>
-  configureStore({ reducer: rootReducer, preloadedState });
+  configureStore({
+    reducer: rootReducer,
+    preloadedState,
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware().concat(socketMiddleware),
+  });
 
 export const store = setupStore();
 
