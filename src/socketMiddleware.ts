@@ -22,6 +22,7 @@ export const socketMiddleware: Middleware<{}, RootState> = (store) => {
   const flush = () => {
     flushScheduled = false;
     if (buffer.size === 0) return;
+    console.log("[flow 8] MW: animation frame -> dispatch pricesUpdated with", buffer.size, "latest tick(s)", [...buffer.keys()]);
     store.dispatch(pricesUpdated([...buffer.values()]));
     buffer.clear();
   };
@@ -43,6 +44,7 @@ export const socketMiddleware: Middleware<{}, RootState> = (store) => {
 
       ws.onopen = () => {
         const symbols = store.getState().watchlist.symbols;
+        console.log("[flow 0] MW: socket open, subscribing everything already in Redux:", symbols);
         if (symbols.length > 0) send({ type: "subscribe", symbols });
       };
 
@@ -54,6 +56,7 @@ export const socketMiddleware: Middleware<{}, RootState> = (store) => {
         }
         if (msg.type !== "tick") return;
 
+        console.log("[flow 7] MW: tick received from server", msg.symbol, msg.price, "-> buffered");
         const { type: _type, ...tick } = msg; // strip `type`, keep the Tick fields
         buffer.set(tick.symbol, tick);
         if (!flushScheduled) {
@@ -67,11 +70,16 @@ export const socketMiddleware: Middleware<{}, RootState> = (store) => {
 
     if (socketDisconnect.match(action)) close();
 
-    if (symbolAdded.match(action))
+    if (symbolAdded.match(action)) {
+      console.log("[flow 2] MW: saw symbolAdded -> sending to server", { type: "subscribe", symbols: [action.payload] });
       send({ type: "subscribe", symbols: [action.payload] });
+    }
     if (symbolRemoved.match(action))
       send({ type: "unsubscribe", symbols: [action.payload] });
 
-    return next(action);
+    const result = next(action);
+    if (symbolAdded.match(action))
+      console.log("[flow 3] reducer: watchlist is now", store.getState().watchlist.symbols);
+    return result;
   };
 };

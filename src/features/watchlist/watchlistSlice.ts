@@ -6,7 +6,10 @@ interface WatchlistState {
 }
 
 //1. inital state
-const initialState: WatchlistState = { symbols: ["TEST"], selected: null };
+const initialState: WatchlistState = {
+  symbols: ["BINANCE:BTCUSDT"], // crypto trades 24/7, so there's always something ticking
+  selected: null,
+};
 
 //2. slice creation
 const watchListSlice = createSlice({

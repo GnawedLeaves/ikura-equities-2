@@ -1,8 +1,11 @@
-import "dotenv/config";
+import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
 import { createServer } from "node:http";
-import { WebSocketServer } from "ws";
+import WebSocket, { WebSocketServer } from "ws";
+
+// dotenv/config only reads `.env`; our key lives in `.env.local` (git-ignored by *.local)
+dotenv.config({ path: ".env.local" });
 
 const app = express();
 app.use(cors({ origin: "http://localhost:5173" }));
@@ -38,9 +41,66 @@ app.get("/api/instruments", async (_req, res) => {
 const server = createServer(app);
 const wss = new WebSocketServer({ server });
 
+// one shared upstream socket to Finnhub (free plan allows 1 connection per key)
+const subscribed = new Set<string>();
+const finnhub = new WebSocket(
+  `wss://ws.finnhub.io?token=${process.env.FINNHUB_API_KEY}`,
+);
+
+const sendToFinnhub = (type: "subscribe" | "unsubscribe", symbol: string) => {
+  if (finnhub.readyState === WebSocket.OPEN) {
+    console.log("[flow 5] SERVER -> Finnhub:", { type, symbol });
+    finnhub.send(JSON.stringify({ type, symbol }));
+  } else {
+    console.log("[flow 5] SERVER: Finnhub not open yet, will replay on open:", symbol);
+  }
+};
+
+// the browser may ask for symbols before Finnhub is connected, so replay them on open
+finnhub.on("open", () => {
+  console.log("finnhub connected");
+  console.log("[flow 5] SERVER: replaying subscriptions:", [...subscribed]);
+  subscribed.forEach((symbol) => sendToFinnhub("subscribe", symbol));
+});
+
+finnhub.on("message", (raw) => {
+  const msg = JSON.parse(raw.toString());
+  if (msg.type !== "trade") return;
+
+  for (const trade of msg.data as { s: string; p: number; v: number; t: number }[]) {
+    const tick = JSON.stringify({
+      type: "tick",
+      symbol: trade.s,
+      price: trade.p,
+      volume: trade.v,
+      ts: trade.t,
+    });
+    console.log("[flow 6] SERVER: Finnhub trade", trade.s, trade.p, "-> tick to", wss.clients.size, "browser(s)");
+    wss.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) client.send(tick);
+    });
+  }
+});
+
+finnhub.on("error", (err) => console.error("finnhub error", err.message));
+finnhub.on("close", (code) => console.log("finnhub closed", code));
+
 wss.on("connection", (socket) => {
   console.log("browser connected");
-  socket.send(JSON.stringify({ type: "hello" }));
+
+  // browser sends { type, symbols[] }; Finnhub takes one symbol per message
+  socket.on("message", (raw) => {
+    const msg = JSON.parse(raw.toString());
+    if (msg.type !== "subscribe" && msg.type !== "unsubscribe") return;
+    console.log("[flow 4] SERVER: browser asked to", msg.type, msg.symbols);
+
+    for (const symbol of msg.symbols as string[]) {
+      if (msg.type === "subscribe") subscribed.add(symbol);
+      else subscribed.delete(symbol);
+      sendToFinnhub(msg.type, symbol);
+    }
+    console.log("[flow 4] SERVER: subscribed set is now", [...subscribed]);
+  });
 });
 
 server.listen(Number(process.env.PORT ?? 3001), () =>

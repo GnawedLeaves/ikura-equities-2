@@ -5,7 +5,6 @@ import {
   TableRow,
   TableHead,
   Table,
-  TableCell,
   TableBody,
 } from "../../ui/table";
 import { Input } from "../../ui/input";
@@ -13,16 +12,19 @@ import { Field, FieldLabel, FieldDescription } from "../../ui/field";
 import { Button } from "../../ui/button";
 import { symbolAdded } from "../../../features/watchlist/watchlistSlice";
 import { fetchInstruments } from "../../../features/instruments/instrumentsSlice";
+import { selectWatchlistRows } from "../../../features/watchlist/selectors";
+import PriceRow from "./PriceRow";
 
 const WatchList = () => {
   //using the redux store etc
   const dispatch = useAppDispatch();
-  const symbols = useAppSelector((state) => state.watchlist.symbols);
+  const rows = useAppSelector(selectWatchlistRows);
 
   const [input, setInput] = useState<string>("");
   const handleAddSymbol = () => {
     const symbol = input.trim().toUpperCase();
     if (symbol) {
+      console.log("[flow 1] UI: user added", symbol, "-> dispatch symbolAdded");
       dispatch(symbolAdded(symbol));
       setInput("");
     }
@@ -64,15 +66,12 @@ const WatchList = () => {
           <TableHeader>
             <TableRow>
               <TableHead>Ticker</TableHead>
-              {/* <TableHead className="text-right">Price</TableHead> */}
+              <TableHead className="text-right">Price</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {symbols.map((h) => (
-              <TableRow key={h}>
-                <TableCell>{h}</TableCell>
-                {/* <TableCell className="text-right">${h.price}</TableCell> */}
-              </TableRow>
+            {rows.map((row) => (
+              <PriceRow key={row.symbol} {...row} />
             ))}
           </TableBody>
         </Table>
