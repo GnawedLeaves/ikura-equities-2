@@ -1,4 +1,8 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import {
+  createAsyncThunk,
+  createSlice,
+  type PayloadAction,
+} from "@reduxjs/toolkit";
 import type { Instrument } from "../../types";
 
 //instruments gets the details of the symbols that watchlist stores
@@ -35,7 +39,13 @@ export const fetchInstruments = createAsyncThunk<
 const instrumentSlice = createSlice({
   name: "instruments",
   initialState: initialState,
-  reducers: {},
+  reducers: {
+    // gives symbols added through search a name; /api/instruments only covers the defaults
+    instrumentAdded(state, action: PayloadAction<Instrument>) {
+      if (!state.items.some((i) => i.symbol === action.payload.symbol))
+        state.items.push(action.payload);
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchInstruments.pending, (state) => {
@@ -56,4 +66,5 @@ const instrumentSlice = createSlice({
   },
 });
 
+export const { instrumentAdded } = instrumentSlice.actions;
 export default instrumentSlice.reducer;

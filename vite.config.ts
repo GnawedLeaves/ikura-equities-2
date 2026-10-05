@@ -8,4 +8,8 @@ export default defineConfig({
   resolve: {
     alias: { "@": path.resolve(__dirname, "./src") },
   },
+  // forward /api/* to the Express server so fetch("/api/...") works from the browser
+  server: {
+    proxy: { "/api": "http://localhost:3001" },
+  },
 });

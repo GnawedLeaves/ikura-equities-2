@@ -15,6 +15,12 @@ export interface Instrument {
   prevClose: number | null;
 }
 
+export interface SearchResult {
+  symbol: string;
+  name: string;
+  type: string; // e.g. "Common Stock", "ADR"
+}
+
 export type ServerMsg =
   | ({ type: "tick" } & Tick)
   | { type: "ping" }

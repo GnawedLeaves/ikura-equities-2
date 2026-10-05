@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../../hooks";
 import {
   TableHeader,
@@ -7,28 +7,16 @@ import {
   Table,
   TableBody,
 } from "../../ui/table";
-import { Input } from "../../ui/input";
-import { Field, FieldLabel, FieldDescription } from "../../ui/field";
-import { Button } from "../../ui/button";
-import { symbolAdded } from "../../../features/watchlist/watchlistSlice";
 import { fetchInstruments } from "../../../features/instruments/instrumentsSlice";
 import { selectWatchlistRows } from "../../../features/watchlist/selectors";
 import PriceRow from "./PriceRow";
+import SymbolSearch from "./SymbolSearch";
 
 const WatchList = () => {
   //using the redux store etc
   const dispatch = useAppDispatch();
   const rows = useAppSelector(selectWatchlistRows);
 
-  const [input, setInput] = useState<string>("");
-  const handleAddSymbol = () => {
-    const symbol = input.trim().toUpperCase();
-    if (symbol) {
-      console.log("[flow 1] UI: user added", symbol, "-> dispatch symbolAdded");
-      dispatch(symbolAdded(symbol));
-      setInput("");
-    }
-  };
   useEffect(() => {
     const request = dispatch(fetchInstruments()); // starts the fetch
     return () => request.abort();
@@ -36,31 +24,7 @@ const WatchList = () => {
 
   return (
     <div style={{ width: 500 }}>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleAddSymbol();
-        }}
-      >
-        <Field>
-          <FieldLabel htmlFor="new-symbol-input">New Symbol</FieldLabel>
-
-          <div style={{ display: "flex", gap: 4 }}>
-            <Input
-              id="new-symbol-input"
-              value={input}
-              onChange={(e) => {
-                setInput(e.target.value);
-              }}
-            />
-            <Button type="submit">Add</Button>
-          </div>
-
-          <FieldDescription>
-            Enter a ticker and select from the dropdown
-          </FieldDescription>
-        </Field>
-      </form>
+      <SymbolSearch />
       <div>
         <Table>
           <TableHeader>

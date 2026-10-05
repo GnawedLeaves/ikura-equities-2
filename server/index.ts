@@ -38,6 +38,35 @@ app.get("/api/instruments", async (_req, res) => {
   }
 });
 
+// symbol search, done server-side so the API key never reaches the browser
+app.get("/api/search", async (req, res) => {
+  const q = String(req.query.q ?? "").trim();
+  if (!q) {
+    res.json([]);
+    return;
+  }
+  try {
+    const url = `https://finnhub.io/api/v1/search?q=${encodeURIComponent(q)}&token=${process.env.FINNHUB_API_KEY}`;
+    const r = await fetch(url);
+    if (!r.ok) {
+      res.status(r.status).json({ message: "Search failed" });
+      return;
+    }
+    const data = (await r.json()) as {
+      result: { description: string; symbol: string; type: string }[];
+    };
+    res.json(
+      data.result.slice(0, 10).map((item) => ({
+        symbol: item.symbol,
+        name: item.description,
+        type: item.type,
+      })),
+    );
+  } catch {
+    res.status(502).json({ message: "Search failed" });
+  }
+});
+
 const server = createServer(app);
 const wss = new WebSocketServer({ server });
 
