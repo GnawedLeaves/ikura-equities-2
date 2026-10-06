@@ -1,9 +1,9 @@
+import { cn } from "cn";
 import { memo } from "react";
-import { useAppSelector } from "../../../hooks";
 import { selectQuoteBySymbol } from "../../../features/prices/pricesSlice";
 import type { WatchlistRow } from "../../../features/watchlist/selectors";
-import { TableRow, TableCell } from "../../ui/table";
-import { cn } from "cn";
+import { useAppSelector } from "../../../hooks";
+import { TableCell, TableRow } from "../../ui/table";
 
 const priceFormat = new Intl.NumberFormat("en-US", {
   minimumFractionDigits: 2,
@@ -14,7 +14,7 @@ const priceFormat = new Intl.NumberFormat("en-US", {
 const PriceRow = memo(({ symbol, name }: WatchlistRow) => {
   const quote = useAppSelector((state) => selectQuoteBySymbol(state, symbol));
 
-  console.log("[flow 9] UI: PriceRow re-rendered", symbol, quote?.price);
+  console.log("[flow 9] UI: PriceRow re-rendered", symbol, quote?.price, quote);
 
   const direction =
     quote?.prevPrice == null || quote.price === quote.prevPrice

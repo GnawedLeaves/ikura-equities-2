@@ -7,9 +7,7 @@ interface WatchlistState {
 
 //1. inital state
 const initialState: WatchlistState = {
-  // matches the server's INSTRUMENTS list so names and prevClose load on startup.
-  // US stocks tick 21:30–04:00 SGT; crypto trades 24/7, so something is always ticking
-  symbols: ["AAPL", "MSFT", "NVDA", "BINANCE:BTCUSDT", "BINANCE:ETHUSDT"],
+  symbols: ["BINANCE:BTCUSDT", "BINANCE:ETHUSDT", "AAPL", "MSFT", "NVDA", "D05.SI"],
   selected: null,
 };
 

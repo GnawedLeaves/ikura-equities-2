@@ -1,10 +1,10 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { useAppDispatch, useAppSelector, useDebounce } from "../../../hooks";
-import { symbolAdded } from "../../../features/watchlist/watchlistSlice";
 import { instrumentAdded } from "../../../features/instruments/instrumentsSlice";
+import { symbolAdded } from "../../../features/watchlist/watchlistSlice";
+import { useAppDispatch, useAppSelector, useDebounce } from "../../../hooks";
 import type { SearchResult } from "../../../types";
+import { Field, FieldDescription, FieldLabel } from "../../ui/field";
 import { Input } from "../../ui/input";
-import { Field, FieldLabel, FieldDescription } from "../../ui/field";
 
 // results remember which query they belong to, so Enter never acts on stale results
 interface Results {
@@ -21,7 +21,7 @@ const SymbolSearch = () => {
   const [message, setMessage] = useState<string | null>(null);
 
   const typed = input.trim();
-  const query = useDebounce(typed, 300); // only search once typing pauses for 300ms
+  const query = useDebounce(typed, 300);
   const isSearching = typed !== "" && results.query !== typed;
 
   useEffect(() => {

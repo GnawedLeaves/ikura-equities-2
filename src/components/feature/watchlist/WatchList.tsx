@@ -1,14 +1,14 @@
 import { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "../../../hooks";
-import {
-  TableHeader,
-  TableRow,
-  TableHead,
-  Table,
-  TableBody,
-} from "../../ui/table";
 import { fetchInstruments } from "../../../features/instruments/instrumentsSlice";
 import { selectWatchlistRows } from "../../../features/watchlist/selectors";
+import { useAppDispatch, useAppSelector } from "../../../hooks";
+import {
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../../ui/table";
 import PriceRow from "./PriceRow";
 import SymbolSearch from "./SymbolSearch";
 
@@ -21,6 +21,11 @@ const WatchList = () => {
     const request = dispatch(fetchInstruments()); // starts the fetch
     return () => request.abort();
   }, [dispatch]);
+
+  useEffect(() => {
+    console.log("hello", { rows })
+
+  }, [rows])
 
   return (
     <div style={{ width: 500 }}>

@@ -1,9 +1,9 @@
+import { Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Moon, Plus, Sun } from "lucide-react";
 import "./App.css";
 import { Button } from "./components/ui/button";
 
-import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router";
+import { BrowserRouter, Route, Routes, } from "react-router";
 import HomePage from "./pages/Homepage";
 
 function App() {
