@@ -12,6 +12,7 @@ export interface Quote extends Tick {
 export interface Instrument {
   symbol: string;
   name: string;
+  lastPrice: number | null; // snapshot from /quote at load time, shown until a live tick arrives
   prevClose: number | null;
 }
 

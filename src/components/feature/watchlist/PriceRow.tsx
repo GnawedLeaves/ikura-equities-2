@@ -21,9 +21,11 @@ const priceFormat = new Intl.NumberFormat("en-US", {
 
 // memo + reading only this symbol's quote means a tick re-renders just this row
 const PriceRow = memo(({ editMode, watchlistRow, handleRemoveTicker }: PriceRowProps) => {
-  const { symbol, name } = watchlistRow
+  const { symbol, name, lastPrice } = watchlistRow
 
   const quote = useAppSelector((state) => selectQuoteBySymbol(state, symbol));
+
+  const price = quote?.price ?? lastPrice;
 
   console.log("[flow 9] UI: PriceRow re-rendered", symbol, quote?.price, quote);
 
@@ -47,7 +49,7 @@ const PriceRow = memo(({ editMode, watchlistRow, handleRemoveTicker }: PriceRowP
           direction === "down" && "text-red-500",
         )}
       >
-        {quote ? priceFormat.format(quote.price) : "—"}
+        {price != null ? priceFormat.format(price) : "—"}
       </TableCell>
       {editMode &&
         <TableCell className="text-right w-10">

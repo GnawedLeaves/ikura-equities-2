@@ -50,7 +50,7 @@ const SymbolSearch = () => {
   // only symbols that came back from Finnhub's search can reach the watchlist
   const add = (item: SearchResult) => {
     console.log("[flow 1] UI: user added", item.symbol, "-> dispatch symbolAdded");
-    dispatch(instrumentAdded({ symbol: item.symbol, name: item.name, prevClose: null }));
+    dispatch(instrumentAdded({ symbol: item.symbol, name: item.name, lastPrice: null, prevClose: null }));
     dispatch(symbolAdded(item.symbol));
     setInput("");
     setMessage(null);

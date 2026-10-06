@@ -5,6 +5,7 @@ import type { Instrument } from "../../types";
 export interface WatchlistRow {
   symbol: string;
   name: string;
+  lastPrice: number | null;
   prevClose: number | null;
 }
 
@@ -25,6 +26,7 @@ export const selectWatchlistRows = createSelector(
       return {
         symbol,
         name: inst?.name ?? symbol,
+        lastPrice: inst?.lastPrice ?? null,
         prevClose: inst?.prevClose ?? null,
       };
     });

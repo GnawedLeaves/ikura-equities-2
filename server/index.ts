@@ -29,7 +29,8 @@ app.get("/api/instruments", async (_req, res) => {
         const url = `https://finnhub.io/api/v1/quote?symbol=${encodeURIComponent(inst.symbol)}&token=${process.env.FINNHUB_API_KEY}`;
         const r = await fetch(url);
         const quote = r.ok ? await r.json() : null;
-        return { ...inst, prevClose: quote?.pc || null };
+        // c = last traded price (still valid when the market is closed), pc = previous close
+        return { ...inst, lastPrice: quote?.c || null, prevClose: quote?.pc || null };
       }),
     );
     res.json(items);
