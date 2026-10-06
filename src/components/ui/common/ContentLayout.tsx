@@ -7,7 +7,7 @@ const ContentLayout = ({ className, ...props }: ComponentProps<"div">) => {
   return (
     <div
       className={cn(
-        "p-8 flex flex-col items-center overflow-hidden",
+        "p-12 flex flex-col items-center overflow-hidden",
         className,
       )}
       {...props}

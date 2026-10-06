@@ -1,17 +1,28 @@
 import { cn } from "cn";
+import { CircleMinus } from "lucide-react";
 import { memo } from "react";
 import { selectQuoteBySymbol } from "../../../features/prices/pricesSlice";
 import type { WatchlistRow } from "../../../features/watchlist/selectors";
 import { useAppSelector } from "../../../hooks";
+import { Button } from "../../ui/button";
 import { TableCell, TableRow } from "../../ui/table";
+
+interface PriceRowProps {
+  editMode: boolean;
+  watchlistRow: WatchlistRow
+  handleRemoveTicker: (symbol: string) => void;
+}
 
 const priceFormat = new Intl.NumberFormat("en-US", {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 });
 
+
 // memo + reading only this symbol's quote means a tick re-renders just this row
-const PriceRow = memo(({ symbol, name }: WatchlistRow) => {
+const PriceRow = memo(({ editMode, watchlistRow, handleRemoveTicker }: PriceRowProps) => {
+  const { symbol, name } = watchlistRow
+
   const quote = useAppSelector((state) => selectQuoteBySymbol(state, symbol));
 
   console.log("[flow 9] UI: PriceRow re-rendered", symbol, quote?.price, quote);
@@ -24,7 +35,7 @@ const PriceRow = memo(({ symbol, name }: WatchlistRow) => {
         : "down";
 
   return (
-    <TableRow>
+    <TableRow >
       <TableCell>
         <div className="font-medium">{symbol}</div>
         <div className="text-muted-foreground text-xs">{name}</div>
@@ -38,6 +49,16 @@ const PriceRow = memo(({ symbol, name }: WatchlistRow) => {
       >
         {quote ? priceFormat.format(quote.price) : "—"}
       </TableCell>
+      {editMode &&
+        <TableCell className="text-right w-10">
+          <Button variant={"ghost"} size={"icon"} aria-label="remove button" onClick={() => {
+            handleRemoveTicker(symbol)
+          }}>
+            <CircleMinus className="text-red-500" />
+          </Button>
+        </TableCell>
+      }
+
     </TableRow>
   );
 });

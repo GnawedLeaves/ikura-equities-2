@@ -1,10 +1,9 @@
+import { useEffect } from "react";
+import SymbolSearch from "../components/feature/watchlist/SymbolSearch";
 import WatchList from "../components/feature/watchlist/WatchList";
 import ContentLayout from "../components/ui/common/ContentLayout";
-import { Moon, Plus, Sun } from "lucide-react";
-import { Button } from "../components/ui/button";
-import { useAppDispatch } from "../hooks";
-import { useEffect } from "react";
 import { fetchInstruments } from "../features/instruments/instrumentsSlice";
+import { useAppDispatch } from "../hooks";
 import { socketConnection, socketDisconnect } from "../socketMiddleware";
 
 const HomePage = () => {
@@ -21,8 +20,10 @@ const HomePage = () => {
     };
   }, [dispatch]);
   return (
-    <ContentLayout>
+    <ContentLayout >
+      <SymbolSearch />
       <WatchList />
+
     </ContentLayout>
   );
 };

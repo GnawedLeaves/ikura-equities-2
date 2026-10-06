@@ -74,7 +74,8 @@ const SymbolSearch = () => {
   const showList = typed !== "" && results.query !== "";
 
   return (
-    <form onSubmit={handleSubmit}>
+
+    <form onSubmit={handleSubmit} className="w-200">
       <Field>
         <FieldLabel htmlFor="symbol-search">Add a stock</FieldLabel>
         <Input
