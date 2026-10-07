@@ -3,7 +3,8 @@ import { CircleMinus } from "lucide-react";
 import { memo } from "react";
 import { selectQuoteBySymbol } from "../../../features/prices/pricesSlice";
 import type { WatchlistRow } from "../../../features/watchlist/selectors";
-import { useAppSelector } from "../../../hooks";
+import { symbolSelected } from "../../../features/watchlist/watchlistSlice";
+import { useAppDispatch, useAppSelector } from "../../../hooks";
 import { Button } from "../../ui/button";
 import { TableCell, TableRow } from "../../ui/table";
 
@@ -23,7 +24,10 @@ const priceFormat = new Intl.NumberFormat("en-US", {
 const PriceRow = memo(({ editMode, watchlistRow, handleRemoveTicker }: PriceRowProps) => {
   const { symbol, name, lastPrice } = watchlistRow
 
+  const dispatch = useAppDispatch();
   const quote = useAppSelector((state) => selectQuoteBySymbol(state, symbol));
+  // a boolean, so selecting a row only re-renders the old and new selected rows
+  const isSelected = useAppSelector((state) => state.watchlist.selected === symbol);
 
   const price = quote?.price ?? lastPrice;
 
@@ -37,7 +41,10 @@ const PriceRow = memo(({ editMode, watchlistRow, handleRemoveTicker }: PriceRowP
         : "down";
 
   return (
-    <TableRow >
+    <TableRow
+      className={cn("cursor-pointer", isSelected && "bg-muted")}
+      onClick={() => dispatch(symbolSelected(isSelected ? null : symbol))}
+    >
       <TableCell>
         <div className="font-medium">{symbol}</div>
         <div className="text-muted-foreground text-xs">{name}</div>
@@ -53,7 +60,8 @@ const PriceRow = memo(({ editMode, watchlistRow, handleRemoveTicker }: PriceRowP
       </TableCell>
       {editMode &&
         <TableCell className="text-right w-10">
-          <Button variant={"ghost"} size={"icon"} aria-label="remove button" onClick={() => {
+          <Button variant={"ghost"} size={"icon"} aria-label="remove button" onClick={(e) => {
+            e.stopPropagation() // don't also select the row
             handleRemoveTicker(symbol)
           }}>
             <CircleMinus className="text-red-500" />

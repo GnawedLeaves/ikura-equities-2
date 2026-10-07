@@ -9,6 +9,15 @@ export interface Quote extends Tick {
   prevPrice: number | null;
 }
 
+// one bar of the candle chart; time is unix seconds at the start of the minute
+export interface Candle {
+  time: number;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+}
+
 export interface Instrument {
   symbol: string;
   name: string;

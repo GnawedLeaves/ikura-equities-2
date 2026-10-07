@@ -30,7 +30,7 @@ const watchListSlice = createSlice({
           (symbol) => symbol !== action.payload,
         );
       }
-      if (state.selected !== action.payload) state.selected = null;
+      if (state.selected === action.payload) state.selected = null;
     },
     symbolSelected(state, action: PayloadAction<string | null>) {
       state.selected = action.payload;

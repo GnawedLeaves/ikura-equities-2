@@ -68,6 +68,70 @@ app.get("/api/search", async (req, res) => {
   }
 });
 
+// 1-minute candles kept in memory, no DB: a candle is just open/high/low/close per time bucket
+interface Candle {
+  time: number; // unix seconds, start of the minute (what lightweight-charts expects)
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+}
+const MAX_CANDLES = 240; // ~4 hours per symbol, so memory stays bounded
+const candles = new Map<string, Candle[]>();
+
+const addTradeToCandles = (symbol: string, price: number, tsMs: number) => {
+  const time = Math.floor(tsMs / 60_000) * 60;
+  const list = candles.get(symbol) ?? [];
+  const last = list[list.length - 1];
+
+  if (last?.time === time) {
+    last.high = Math.max(last.high, price);
+    last.low = Math.min(last.low, price);
+    last.close = price;
+  } else if (!last || time > last.time) {
+    list.push({ time, open: price, high: price, low: price, close: price });
+    if (list.length > MAX_CANDLES) list.shift();
+  }
+  candles.set(symbol, list);
+};
+
+// Finnhub's candle API is paid-only, so crypto history comes from Binance's free public klines
+const seedFromBinance = async (symbol: string) => {
+  if (!symbol.startsWith("BINANCE:") || candles.get(symbol)?.length) return;
+  try {
+    const pair = symbol.slice("BINANCE:".length);
+    const r = await fetch(
+      `https://api.binance.com/api/v3/klines?symbol=${pair}&interval=1m&limit=120`,
+    );
+    if (!r.ok) return;
+    const rows = (await r.json()) as [number, string, string, string, string][];
+    const history = rows.map(([openTime, o, h, l, c]) => ({
+      time: openTime / 1000,
+      open: Number(o),
+      high: Number(h),
+      low: Number(l),
+      close: Number(c),
+    }));
+    const lastSeeded = history[history.length - 1];
+    if (!lastSeeded) return;
+    // keep any live candles that arrived while we were fetching
+    const live = (candles.get(symbol) ?? []).filter((c) => c.time > lastSeeded.time);
+    candles.set(symbol, [...history, ...live]);
+  } catch {
+    // no history is fine, the chart just builds up from live ticks
+  }
+};
+
+app.get("/api/candles", async (req, res) => {
+  const symbol = String(req.query.symbol ?? "").trim();
+  if (!symbol) {
+    res.status(400).json({ message: "symbol is required" });
+    return;
+  }
+  await seedFromBinance(symbol);
+  res.json(candles.get(symbol) ?? []);
+});
+
 const server = createServer(app);
 const wss = new WebSocketServer({ server });
 
@@ -98,6 +162,7 @@ finnhub.on("message", (raw) => {
   if (msg.type !== "trade") return;
 
   for (const trade of msg.data as { s: string; p: number; v: number; t: number }[]) {
+    addTradeToCandles(trade.s, trade.p, trade.t);
     const tick = JSON.stringify({
       type: "tick",
       symbol: trade.s,

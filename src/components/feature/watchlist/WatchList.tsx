@@ -10,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "../../ui/table";
+import CandleChart from "./CandleChart";
 import PriceRow from "./PriceRow";
 
 
@@ -17,6 +18,7 @@ const WatchList = () => {
   //using the redux store etc
   const dispatch = useAppDispatch();
   const rows = useAppSelector(selectWatchlistRows);
+  const selected = useAppSelector((state) => state.watchlist.selected);
   const [editMode, setEditMode] = useState<boolean>(false)
 
   const [itemsToBeRemoved, setItemsToBeRemoved] = useState<string[]>([])
@@ -73,6 +75,7 @@ const WatchList = () => {
           </TableBody>
         </Table>
       </div>
+      {selected && <CandleChart symbol={selected} />}
     </div>
   );
 };
