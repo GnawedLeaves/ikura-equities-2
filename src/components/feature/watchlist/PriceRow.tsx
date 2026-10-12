@@ -6,6 +6,7 @@ import type { WatchlistRow } from "../../../features/watchlist/selectors";
 import { useAppSelector } from "../../../hooks";
 import { Button } from "../../ui/button";
 import { TableCell, TableRow } from "../../ui/table";
+import StaleBadge from "./StaleBadge";
 
 interface PriceRowProps {
   editMode: boolean;
@@ -39,7 +40,11 @@ const PriceRow = memo(({ editMode, watchlistRow, handleRemoveTicker }: PriceRowP
   return (
     <TableRow >
       <TableCell>
-        <div className="font-medium">{symbol}</div>
+        <div className="flex gap-1">
+          <div className="font-medium">{symbol}</div>
+
+          <StaleBadge receivedAt={quote?.receivedAt} />
+        </div>
         <div className="text-muted-foreground text-xs">{name}</div>
       </TableCell>
       <TableCell

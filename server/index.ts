@@ -1,6 +1,6 @@
+import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
-import cors from "cors";
 import { createServer } from "node:http";
 import WebSocket, { WebSocketServer } from "ws";
 
@@ -104,6 +104,7 @@ finnhub.on("message", (raw) => {
       price: trade.p,
       volume: trade.v,
       ts: trade.t,
+      receivedAt: Date.now()
     });
     console.log("[flow 6] SERVER: Finnhub trade", trade.s, trade.p, "-> tick to", wss.clients.size, "browser(s)");
     wss.clients.forEach((client) => {
