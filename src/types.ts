@@ -3,6 +3,7 @@ export interface Tick {
   price: number;
   volume: number;
   ts: number; // milliseconds since epoch
+  receivedAt: number;
 }
 
 export interface Quote extends Tick {
